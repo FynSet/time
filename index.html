@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Time Zone Converter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            color: #666;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            box-sizing: border-box; /* Makes sure padding doesn't affect overall width */
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #results {
+            margin-top: 30px;
+        }
+        #results p {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Time Zone Converter</h1>
+        <div>
+            <label for="utcTime">Enter UTC Time:</label>
+            <input type="text" id="utcTime" placeholder="YYYY-MM-DD HH:mm" />
+            <button onclick="convertFromUTC()">Convert</button>
+        </div>
+        <div>
+            <label for="sgTime">Enter SG Time:</label>
+            <input type="text" id="sgTime" placeholder="YYYY-MM-DD HH:mm" />
+            <button onclick="convertFromSG()">Convert</button>
+        </div>
+        <div>
+            <label for="gmtMinus7Time">Enter GMT-7 Time:</label>
+            <input type="text" id="gmtMinus7Time" placeholder="YYYY-MM-DD HH:mm" />
+            <button onclick="convertFromGMTMinus7()">Convert</button>
+        </div>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function convertFromUTC() {
+            var utcTime = moment.utc(document.getElementById("utcTime").value);
+            var sgTime = utcTime.clone().utcOffset('+08:00');
+            var gmtMinus7Time = utcTime.clone().utcOffset('-07:00');
+
+            displayConvertedTimes(utcTime, sgTime, gmtMinus7Time);
+        }
+
+        function convertFromSG() {
+            var sgTime = moment(document.getElementById("sgTime").value).utcOffset('+08:00');
+            var utcTime = sgTime.clone().utc();
+            var gmtMinus7Time = sgTime.clone().utcOffset('-07:00');
+            displayConvertedTimes(utcTime, sgTime, gmtMinus7Time);
+        }
+
+        function convertFromGMTMinus7() {
+            var gmtMinus7Time = moment(document.getElementById("gmtMinus7Time").value).utcOffset('-07:00');
+            var utcTime = gmtMinus7Time.clone().utc();
+            var sgTime = gmtMinus7Time.clone().utcOffset('+08:00');
+            displayConvertedTimes(utcTime, sgTime, gmtMinus7Time);
+        }
+
+        function displayConvertedTimes(utcTime, sgTime, gmtMinus7Time) {
+            // Calculate differences
+            var diffSGToUTC = sgTime.isValid() ? sgTime.diff(utcTime, 'hours') : 'N/A';
+            var diffGMTMinus7ToUTC = gmtMinus7Time.isValid() ? gmtMinus7Time.diff(utcTime, 'hours') : 'N/A';
+            var diffSGToGMTMinus7 = sgTime.isValid() && gmtMinus7Time.isValid() ? sgTime.diff(gmtMinus7Time, 'hours') : 'N/A';
+
+            // Display results with differences
+            var resultsDiv = document.getElementById("results");
+            console.log(sgTime.format());
+
+            resultsDiv.innerHTML =
+                "<p>UTC Time: " + (utcTime.isValid() ? utcTime.format() : 'Invalid input') + "</p>" +
+                "<p>SG Time: " + (sgTime.isValid() ? sgTime.format() : 'Invalid input') + "</p>" +
+                "<p>GMT-7 Time: " + (gmtMinus7Time.isValid() ? gmtMinus7Time.format() : 'Invalid input') + "</p>" +
+                "<p>Difference between SG and GMT-7: " + diffSGToGMTMinus7 + " hours</p>";
+        }
+    </script>
+
+</body>
+</html>
